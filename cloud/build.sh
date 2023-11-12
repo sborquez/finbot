@@ -18,6 +18,7 @@ else
     gcloud config set project $project_id
     gcloud services enable logging.googleapis.com \
                         eventarc.googleapis.com \
+                        gmail.googleapis.com \
                         cloudfunctions.googleapis.com \
                         cloudbuild.googleapis.com \
                         artifactregistry.googleapis.com

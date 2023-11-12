@@ -160,3 +160,8 @@ cython_debug/
 #.idea/
 
 ignore
+
+# Gmail API
+credentials.json
+token.json
+account_data.json

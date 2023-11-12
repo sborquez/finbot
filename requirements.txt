@@ -1,10 +1,15 @@
-google-api-core==2.11.1
-google-auth==2.22.0
-google-cloud-functions==1.13.2
-google-cloud-pubsub==2.18.3
-google-cloud-storage==2.10.0
-googleapis-common-protos==1.60.0
-grpc-google-iam-v1==0.12.6
-grpcio==1.57.0
-grpcio-status==1.57.0
-protobuf==4.24.2
+# google-api-core==2.11.1
+# google-auth==2.22.0
+# google-cloud-functions==1.13.2
+# google-cloud-pubsub==2.18.3
+# google-cloud-storage==2.10.0
+# googleapis-common-protos==1.60.0
+# grpc-google-iam-v1==0.12.6
+# grpcio==1.57.0
+# grpcio-status==1.57.0
+google-auth==2.23.4
+google-api-python-client==2.107.0
+google-auth-httplib2==0.1.1
+google-auth-oauthlib==1.1.0
+protobuf==4.25.0
+

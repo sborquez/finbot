@@ -18,4 +18,4 @@ It requires `python3` and `protoc`.
 
 ## Protocol Buffers Defined
 
-* `Sensor`: Message with the readings of a sensor device.
+* `Transaction`: Represents a transaction

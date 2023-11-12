@@ -4,19 +4,19 @@ package finbot.data;
 
 
 enum AccountType {
-    CHECKING = 0;
-    SAVINGS = 1;
+    OTHER = 0;
+    DEBIT_CARD = 1;
     CREDIT_CARD = 2;
-    INVESTMENT = 3;
-    LOAN = 4;
-    OTHER = 5;
+    SAVINGS = 3;
+    INVESTMENT = 4;
+    LOAN = 5;
+    CHECKING = 6;
 }
 
 
 enum TransactionType {
-    NO_COMPUTED = 0;
-    INCOME = 1;
-    EXPENSE = 2;
+    INCOME = 0;
+    EXPENSE = 1;
 }
 
 enum InstallmentType {
@@ -27,20 +27,21 @@ enum InstallmentType {
 message Transaction {
     // Identification
     string uuid = 1;
-    string reference_uuid = 2;
 
     // Account information
-    string account_owner = 10;
-    string account_uuid = 11;
-    string account_alias = 12;
-    AccountType account_type = 13;
-    string account_bank = 14;
-    string account_currency = 15;
+    string account_owner_uuid = 10;  // An internal identifier
+    string account_owner_email = 11;  // An email address
+
+    string account_uuid = 12;  // A unique identifier
+    string account_alias = 13; // A human readable name
+    AccountType account_type = 14;
+    string account_bank = 15;
+    string account_currency = 16;
 
     // Transaction information
-    string date = 20;
-    int64 period = 21;
-    string place = 22;
+    string date = 20;  // YYYY-MM-DD
+    string gdate_time = 21;  // YYYY-MM-DD HH:MM:SS
+    int64 period = 22;
     float amount = 23;
     TransactionType type = 24;
     string description = 25;
