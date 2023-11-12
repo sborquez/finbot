@@ -84,7 +84,7 @@ def parse_bancochile_email(mail: dict) -> Optional[transaction_v1_pb2.Transactio
         transaction.date = date.strftime("%Y-%m-%d")
         transaction.gdate_time = date.strftime("%Y-%m-%dT%H:%M:%S")
 
-        transaction.amount = float(match["amount"])
+        transaction.amount = float(match["amount"].replace(".", ""))
         transaction.type = transaction_v1_pb2.TransactionType.EXPENSE
         transaction.description = match["description"]
 
@@ -165,6 +165,7 @@ def extract_gmail_data(date: Optional[str] = None, senders: List[str] = ["enviod
             transaction = PARSERS[from_email](msg)
             if transaction:
                 print(transaction)
+                print()
                 # TODO: Mark message as read 
                 transactions.append(transaction)
             else:
