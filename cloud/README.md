@@ -16,12 +16,9 @@ These scripts are used to setup the cloud infrastructure.
 ```bash
 .
 
-├── build_steps/        # Steps used by the build script
-│   ├── 01_setup.sh     # Create the project and enable the APIs
-│   ├── 02_pubsub.sh    # Create the Pub/Sub topic and subscription
+├── settings.sh     # Variables used by the build and destroy scripts
 ├── build.sh        # Build the cloud infrastructure
 ├── destroy.sh      # Destroy the cloud infrastructure
-├── settings.sh    # Variables used by the build and destroy scripts
 └── README.md       # This file
 ```
 
