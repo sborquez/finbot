@@ -35,6 +35,16 @@ Invoke-WebRequest -Uri https://dl.google.com/dl/cloudsdk/channels/rapid/GoogleCl
 choco install protoc
 ```
 
+## Usage
+
+### Gmail Token
+
+```bash
+cd finbot_stream
+python google_credentials.py
+```
+
+
 ## References
 
 * [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)

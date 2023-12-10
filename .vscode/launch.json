@@ -5,22 +5,40 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Gmail Extractor",
+            // Run python script as module
+            "name": "Run Gmail Extractor (date)",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/finbot_stream/gmail_source.py",
+            "module": "finbot_stream.gmail_source",
             "console": "integratedTerminal",
             "justMyCode": true,
             "env": {
-                "GOOGLE_APPLICATION_CREDENTIALS": "${workspaceFolder}/finbot_stream/credentials.json",
                 "TOKEN_FILE": "${workspaceFolder}/token.json",
                 "ACCOUNT_DATA": "${workspaceFolder}/account_data.json",
             },
             "args": [
-                "-d", "2023-11-11",
+                "-d", "2023-11-27",
                 "-q", "enviodigital@bancochile.cl",
-                "-o", "outout.jsonl",
-                "-s", "SHEET_ID"
+                "-o", "output.csv",
+                "-s", "1u1L9OlYn4cEagHArehhUtI5dklPJyfieEe87AT3kn7M"
+            ]
+        },
+        {
+            "name": "Run Gmail Extractor (Range)",
+            "type": "python",
+            "request": "launch",
+            "module": "finbot_stream.gmail_source",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "TOKEN_FILE": "${workspaceFolder}/token.json",
+                "ACCOUNT_DATA": "${workspaceFolder}/account_data.json",
+            },
+            "args": [
+                "-r", "2023-12-03", "2023-12-09",
+                "-q", "enviodigital@bancochile.cl",
+                "-o", "output.csv",
+                "-s", "1u1L9OlYn4cEagHArehhUtI5dklPJyfieEe87AT3kn7M"
             ]
 
         }

@@ -11,26 +11,22 @@ We will also create a function that will take a list of Transaction Protobufs
 and write them to a file and/or to a Google Sheet.
 """
 import os
-import sys
-
-# TODO: Check if this work with Cloud Functions
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-import base64
 import datetime
+import hashlib
 import json
 import re
-from typing import Callable, Dict, List, Optional
+# import sys
+from typing import Callable, Dict, Optional
 
-# # Import the Google Auth library.
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # Import the Transaction Protobuf.
+# sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import finbot_core.py.transaction_v1_pb2 as transaction_v1_pb2
+import finbot_stream.google_credentials as google_credentials
+from finbot_stream.sinks import write_to_file, write_to_google_sheet
+
 
 TOKEN_FILE = os.environ.get("TOKEN_FILE", "token.json")
 ACCOUNT_DATA_FILE = os.environ.get("ACCOUNT_DATA", "account_data.json")
@@ -63,11 +59,12 @@ def parse_bancochile_email(mail: dict) -> Optional[transaction_v1_pb2.Transactio
     if subject == "Compra con Tarjeta de Crédito":
         content = mail["snippet"]
         pattern = re.compile(
-            r"(.*?): Te informamos que se ha realizado una compra por \$(?P<amount>[\d.]+) con Tarjeta de Crédito \*\*\*\*(?P<account>\d{4}) en (?P<description>[^0-9]+) el (?P<date>\d{2}/\d{2}/\d{4} \d{2}:\d{2})."
+            r"(.*?): Te informamos que se ha realizado una compra por \$(?P<amount>[\d.]+) con Tarjeta de Crédito \*\*\*\*(?P<account>\d{4}) en (?P<description>.+) el (?P<date>\d{2}/\d{2}/\d{4} \d{2}:\d{2})."
         )
-        match = pattern.search(content).groupdict()
+        match = pattern.search(content)
         if not match:
             return None
+        match = match.groupdict()
 
         # Build Transaction Protobuf
         transaction = transaction_v1_pb2.Transaction()
@@ -93,7 +90,8 @@ def parse_bancochile_email(mail: dict) -> Optional[transaction_v1_pb2.Transactio
         # transaction.total_installments = 1
         # transaction.total_amount = transaction.amount
 
-        transaction.uuid = str(hash(owner_email + transaction.gdate_time + content))
+        # transaction.uuid = str(hash(transaction.account_owner_email + transaction.gdate_time + transaction.description))
+        transaction.uuid = hashlib.sha256((transaction.account_owner_email + transaction.gdate_time + transaction.description).encode("utf-8")).hexdigest()
     else:
         print(f"Unknown subject: {subject}")
         # content = mail["payload"]["parts"][0]["body"]["data"]
@@ -107,37 +105,34 @@ PARSERS: Dict[str, Callable[[dict], Optional[transaction_v1_pb2.Transaction]]] =
 }
 
 
-def extract_gmail_data(date: Optional[str] = None, senders: List[str] = ["enviodigital@bancochile.cl"]) -> List[transaction_v1_pb2.Transaction]:
+def extract_gmail_data(start_date: Optional[str] = None, end_date: Optional[str] = None,
+                       senders: list[str] = ["enviodigital@bancochile.cl"]) -> list[transaction_v1_pb2.Transaction]:
     """
     Extracts data from the Gmail API.
 
     Args:
-        date: The date to extract the data from. If None, then extract today's
-            data. The date is in the format YYYY-MM-DD.
+        start_date: The start date to extract the data from. If None, then extract
+            today's data. The date is in the format YYYY-MM-DD.
+        end_date: The end date to extract the data from. If None, then extract
+            today's data. The date is in the format YYYY-MM-DD.
+        senders: The senders to extract the data from.
 
     Returns:
         A list of Transaction Protobufs.
     """
     # Setup Credentials
-    SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
-    if not os.path.exists(TOKEN_FILE):
-        raise FileNotFoundError("The token file does not exist.")
-    creds = Credentials.from_authorized_user_file(
-        TOKEN_FILE, SCOPES
-    )
-    if not creds.valid:
-        if creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            raise ValueError("The credentials are invalid.")
-        with open(TOKEN_FILE, "w") as token:
-            token.write(creds.to_json())
+    creds = google_credentials.setup_credentials(TOKEN_FILE, google_credentials.SCOPES)
 
-    # Build query 
-    if not date:
+    # Build query
+    if not start_date:
         print("No date provided.")
         date = datetime.date.today().strftime("%Y-%m-%d")
-    query = f"after:{date}"
+        start_date = date
+        end_date = (datetime.datetime.strptime(date, "%Y-%m-%d") + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    elif not end_date:
+        end_date = (datetime.datetime.strptime(start_date, "%Y-%m-%d") + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+
+    query = f"after:{start_date} before:{end_date}"
 
     if senders:
         query += " AND ("
@@ -171,35 +166,16 @@ def extract_gmail_data(date: Optional[str] = None, senders: List[str] = ["enviod
             else:
                 print("No transaction found.")
 
-    except errors.HttpError as error:
+        transactions = sorted(transactions, key=lambda t: t.gdate_time)
+
+    except HttpError as error:
         print(f"An error occurred: {error}")
 
     return transactions
 
 
-def write_to_file(transactions: List[transaction_v1_pb2.Transaction]) -> None:
-    """
-    Writes a list of Transaction Protobufs to a file.
-
-    Args:
-        transactions: A list of Transaction Protobufs.
-    """
-    pass
-
-
-def write_to_google_sheet(transactions: List[transaction_v1_pb2.Transaction]) -> None:
-    """
-    Writes a list of Transaction Protobufs to a Google Sheet.
-
-    Args:
-        transactions: A list of Transaction Protobufs.
-    """
-    pass
-
-
-def main(
-    date: Optional[str] = None, senders: List[str] = ["enviodigital@bancochile.cl"],
-    output_file: Optional[str] = None, sheet: Optional[str] = None) -> None:
+def main(start_date: Optional[str] = None, end_date: Optional[str] = None,
+         senders: list[str] = ["enviodigital@bancochile.cl"],  output_file: Optional[str] = None, sheet: Optional[str] = None) -> None:
     """
     Extracts data from the Gmail API and writes it to a file and/or to a Google
     Sheet.
@@ -208,20 +184,24 @@ def main(
         output_file: The output file to write the data to.
         sheet: The Google Sheet to write the data to.
     """
-    transactions = extract_gmail_data(date, senders)
+    transactions = extract_gmail_data(start_date, end_date, senders)
     if output_file:
-        write_to_file(transactions)
+        write_to_file(transactions, output_file)
     if sheet:
-        write_to_google_sheet(transactions)
+        write_to_google_sheet(transactions, sheet, TOKEN_FILE)
 
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(
         description="Extracts data from the Gmail API.")
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group(required=True)  # Either -d or -r is required
+    group.add_argument(
         "-d", "--date",
         help="The date to extract the data from. If None, then extract today's data. The date is in the format YYYY-MM-DD.")
+    group.add_argument(
+        "-r", "--range", nargs=2,
+        help="The range of dates to extract the data from. The dates are in the format YYYY-MM-DD.")
     parser.add_argument(
         "-q", "--senders",
         nargs="*",  # 0 or more arguments
@@ -235,4 +215,8 @@ if __name__ == "__main__":
         help='The Google Sheet to write the data to.')
     args = parser.parse_args()
 
-    main(args.date, args.senders, args.output_file, args.sheet)
+    if args.range:
+        start_date, end_date = args.range
+        main(start_date, end_date, args.senders, args.output_file, args.sheet)
+    else:
+        main(args.date, None, args.senders, args.output_file, args.sheet)
