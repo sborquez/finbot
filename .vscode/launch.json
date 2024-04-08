@@ -1,0 +1,59 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Run python script as module
+            "name": "Run Gmail Extractor (date)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "finbot_stream.gmail_source",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "TOKEN_FILE": "${workspaceFolder}/token.json",
+                "ACCOUNT_DATA": "${workspaceFolder}/account_data.json",
+            },
+            "args": [
+                "-d", "2023-11-27",
+                "-q", "enviodigital@bancochile.cl",
+                "-o", "output.csv",
+                "-s", "1pj7jbffUGUcu0S5SMSq6LY4wZaE5K7p6ha4PLa4Bn8A"
+            ]
+        },
+        {
+            "name": "Run Gmail Extractor (Range)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "finbot_stream.gmail_source",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "TOKEN_FILE": "${workspaceFolder}/token.json",
+                "ACCOUNT_DATA": "${workspaceFolder}/account_data.json",
+            },
+            "args": [
+                "-r", "2024-03-31", "2024-04-03",  
+                "-q", "enviodigital@bancochile.cl",
+                "-o", "output.csv",
+                "-s", "1pj7jbffUGUcu0S5SMSq6LY4wZaE5K7p6ha4PLa4Bn8A"
+            ]
+        },
+        {
+            "name": "Renovate Token",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "google_credentials.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/finbot_stream",
+            "args": [
+                "--credentials_file", "${workspaceFolder}/credentials.json",
+                "--token_file", "${workspaceFolder}/token.json",
+            ]
+
+        }
+    ]
+}

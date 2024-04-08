@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package finbot.data;
+
+
+enum AccountType {
+    OTHER = 0;
+    DEBIT_CARD = 1;
+    CREDIT_CARD = 2;
+    SAVINGS = 3;
+    INVESTMENT = 4;
+    LOAN = 5;
+    CHECKING = 6;
+}
+
+
+enum TransactionType {
+    INCOME = 0;
+    EXPENSE = 1;
+}
+
+enum InstallmentType {
+    SINGLE = 0;
+    MULTIPLE = 1;
+}
+
+message Transaction {
+    // Identification
+    string uuid = 1;
+
+    // Account information
+    string account_owner_uuid = 10;  // An internal identifier
+    string account_owner_email = 11;  // An email address
+
+    string account_uuid = 12;  // A unique identifier
+    string account_alias = 13; // A human readable name
+    AccountType account_type = 14;
+    string account_bank = 15;
+    string account_currency = 16;
+
+    // Transaction information
+    string date = 20;  // YYYY-MM-DD
+    string gdate_time = 21;  // YYYY-MM-DD HH:MM:SS
+    int64 period = 22;
+    float amount = 23;
+    TransactionType type = 24;
+    string description = 25;
+
+    // Transaction installment information
+    InstallmentType installment_type = 30;
+    int32 installment = 31;
+    int32 total_installments = 32;
+    float total_amount = 33;
+
+    // Transaction category
+    string category = 40;
+    string subcategory_1 = 41;
+    string subcategory_2 = 42;
+    string subcategory_3 = 43;
+}
