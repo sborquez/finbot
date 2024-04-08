@@ -17,7 +17,7 @@ def write_to_file(transactions: list[transaction_v1_pb2.Transaction], output_fil
     print("Writing to file...")
     header = [
         'uuid', 'checked', 'date', 'income', 'expense', 'account', 'installment_type',
-        'description', 'category',  'subcategory'
+        'description', 'category', 'subcategory'
     ]
     if not os.path.exists(output_file):
         with open(output_file, "w") as f:
@@ -77,7 +77,7 @@ def write_to_google_sheet(transactions: list[transaction_v1_pb2.Transaction], sp
     # Build the body
     header = [
         'uuid', 'checked', 'date', 'income', 'expense', 'account', 'installment_type',
-        'description', 'category',  'subcategory'
+        'description', 'category', 'subcategory'
     ]
     values = []
     if last_row == 1:
@@ -105,7 +105,7 @@ def write_to_google_sheet(transactions: list[transaction_v1_pb2.Transaction], sp
             valueInputOption="USER_ENTERED",
             range=f"FinBot!A{last_row}:{chr(ord('A') + len(header) - 1)}{last_row + write_rows - 1}",
             body={
-               "values": values
+                "values": values
             },
         )
         .execute()

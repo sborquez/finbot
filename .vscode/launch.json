@@ -7,7 +7,7 @@
         {
             // Run python script as module
             "name": "Run Gmail Extractor (date)",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "finbot_stream.gmail_source",
             "console": "integratedTerminal",
@@ -20,12 +20,12 @@
                 "-d", "2023-11-27",
                 "-q", "enviodigital@bancochile.cl",
                 "-o", "output.csv",
-                "-s", "1u1L9OlYn4cEagHArehhUtI5dklPJyfieEe87AT3kn7M"
+                "-s", "1pj7jbffUGUcu0S5SMSq6LY4wZaE5K7p6ha4PLa4Bn8A"
             ]
         },
         {
             "name": "Run Gmail Extractor (Range)",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "finbot_stream.gmail_source",
             "console": "integratedTerminal",
@@ -35,10 +35,23 @@
                 "ACCOUNT_DATA": "${workspaceFolder}/account_data.json",
             },
             "args": [
-                "-r", "2023-12-03", "2023-12-09",
+                "-r", "2024-03-31", "2024-04-03",  
                 "-q", "enviodigital@bancochile.cl",
                 "-o", "output.csv",
-                "-s", "1u1L9OlYn4cEagHArehhUtI5dklPJyfieEe87AT3kn7M"
+                "-s", "1pj7jbffUGUcu0S5SMSq6LY4wZaE5K7p6ha4PLa4Bn8A"
+            ]
+        },
+        {
+            "name": "Renovate Token",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "google_credentials.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/finbot_stream",
+            "args": [
+                "--credentials_file", "${workspaceFolder}/credentials.json",
+                "--token_file", "${workspaceFolder}/token.json",
             ]
 
         }

@@ -51,8 +51,11 @@ def parse_bancochile_email(mail: dict) -> Optional[transaction_v1_pb2.Transactio
     for header in mail["payload"]["headers"]:
         if header["name"] == "Subject":
             subject = header["value"]
-        elif header["name"] == "To":
-            owner_email = re.search(r"<(.*)>", header["value"]).group(1)
+        elif owner_email is None and (header["name"] == "To" or header["name"] == "Delivered-To"):
+            if re.search(r"<(.*)>", header["value"]) is not None:
+                owner_email = re.search(r"<(.*)>", header["value"]).group(1)
+            else:
+                owner_email = header["value"]
 
     # Get data from body
     print(f"Parsing: {subject}")
@@ -77,7 +80,7 @@ def parse_bancochile_email(mail: dict) -> Optional[transaction_v1_pb2.Transactio
         transaction.account_bank = "Banco de Chile"
         transaction.account_currency = ACCOUNT_DATA[owner_email][account_uuid].get("currency", None)
 
-        date = datetime.datetime.strptime(match["date"],  "%d/%m/%Y %H:%M")
+        date = datetime.datetime.strptime(match["date"], "%d/%m/%Y %H:%M")
         transaction.date = date.strftime("%Y-%m-%d")
         transaction.gdate_time = date.strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -156,7 +159,8 @@ def extract_gmail_data(start_date: Optional[str] = None, end_date: Optional[str]
         for message in messages:
             msg = service.users().messages().get(userId="me", id=message["id"]).execute()
             from_email = next(filter(lambda header: header["name"] == "From", msg["payload"]["headers"]))["value"]
-            from_email = re.search(r"<(.*)>", from_email).group(1)
+            if re.search(r"<(.*)>", from_email) is not None:
+                from_email = re.search(r"<(.*)>", from_email).group(1)
             transaction = PARSERS[from_email](msg)
             if transaction:
                 print(transaction)
@@ -175,7 +179,7 @@ def extract_gmail_data(start_date: Optional[str] = None, end_date: Optional[str]
 
 
 def main(start_date: Optional[str] = None, end_date: Optional[str] = None,
-         senders: list[str] = ["enviodigital@bancochile.cl"],  output_file: Optional[str] = None, sheet: Optional[str] = None) -> None:
+         senders: list[str] = ["enviodigital@bancochile.cl"], output_file: Optional[str] = None, sheet: Optional[str] = None) -> None:
     """
     Extracts data from the Gmail API and writes it to a file and/or to a Google
     Sheet.
