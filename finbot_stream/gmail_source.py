@@ -28,7 +28,9 @@ import finbot_stream.google_credentials as google_credentials
 from finbot_stream.sinks import write_to_file, write_to_google_sheet
 
 
+# TODO: use other types of authentication
 TOKEN_FILE = os.environ.get("TOKEN_FILE", "token.json")
+# TODO: Move data to a database
 ACCOUNT_DATA_FILE = os.environ.get("ACCOUNT_DATA", "account_data.json")
 with open(ACCOUNT_DATA_FILE, "r") as f:
     ACCOUNT_DATA = json.load(f)

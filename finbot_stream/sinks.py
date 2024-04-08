@@ -111,3 +111,14 @@ def write_to_google_sheet(transactions: list[transaction_v1_pb2.Transaction], sp
         .execute()
     )
     print('Sheet successfully Updated')
+
+
+def write_to_topic(transactions: list[transaction_v1_pb2.Transaction], topic: str) -> None:
+    """
+    Writes a list of Transaction Protobufs to a Google Pub/Sub topic.
+
+    Args:
+        transactions: A list of Transaction Protobufs.
+        topic: The Google Pub/Sub topic to write the data to.
+    """
+    print("Writing to Pub/Sub topic...")

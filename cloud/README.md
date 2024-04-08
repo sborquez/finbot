@@ -1,6 +1,6 @@
 # Cloud Pub/Sub
 
-Setup for the cloud infrastructure.
+Setup for the cloud infrastructure. TODO: use Serverless Framework.
 
 ## Quick start
 

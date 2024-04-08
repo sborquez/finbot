@@ -1,6 +1,18 @@
 # finbot
 A tiny bot that will help you to track your finances.
 
+## TODOs:
+
+- [x] Read emails from Gmail
+- [ ] Read from a pdf file
+- [ ] Read from a file
+- [ ] Read from a Pub/Sub
+- [x] Write to a file
+- [x] Write to Google Sheets
+- [ ] write to  Pub/Sub
+- [ ] Write to a firestore database
+- [ ] Write to a SQL database
+- [ ] Use a serverless framework with Google Cloud Functions
 
 ## Setup
 
@@ -37,13 +49,7 @@ choco install protoc
 
 ## Usage
 
-### Gmail Token
-
-```bash
-cd finbot_stream
-python google_credentials.py
-```
-
+Check the `.vscode/launch.json` file for the usage of the scripts.
 
 ## References
 
